@@ -6,5 +6,7 @@
 
 mod errors;
 mod resolver;
+mod renderer;
 
-pub use crate::errors::{Error, Result};
+pub use crate::errors::{DocumentError, Result};
+pub use crate::resolver::DataProvider;
