@@ -1,0 +1,25 @@
+[package]
+name = "wit-spell-check"
+version = "0.0.0"
+authors = ["Aster <192607617@qq.com>"]
+description = "Generate documentation based on wit files"
+repository = "https://github.com/oovm/wit-document"
+documentation = "https://docs.rs/wit-document"
+readme = "readme.md"
+license = "MPL-2.0"
+edition = "2021"
+exclude = ["package.json", "tests/**"]
+
+[dependencies]
+anyhow = "1.0.80"
+wit-component = "0.201.0"
+wit-parser = "0.201.0"
+indexmap = "2.2.3"
+
+[dev-dependencies]
+
+[features]
+default = []
+
+[package.metadata.docs.rs]
+all-features = true
