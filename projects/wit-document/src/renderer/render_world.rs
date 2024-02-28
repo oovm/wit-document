@@ -1,5 +1,5 @@
-
 use super::*;
+use std::borrow::Cow;
 
 impl DocumentElementIcon for World {
     fn get_icon_name(&self) -> char {
@@ -8,8 +8,8 @@ impl DocumentElementIcon for World {
 }
 
 impl DocumentElement for World {
-    fn get_name(&self, _: &DataProvider) -> &str {
-        self.name.as_ref()
+    fn get_name(&self, _: &DataProvider) -> Cow<str> {
+        Cow::Borrowed(self.name.as_ref())
     }
 
     fn get_link(&self, data: &DataProvider) -> String {
@@ -24,4 +24,3 @@ impl DocumentElement for World {
         todo!()
     }
 }
-

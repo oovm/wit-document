@@ -1,5 +1,5 @@
 use super::*;
-
+use std::borrow::Cow;
 
 impl DocumentElementIcon for Interface {
     fn get_icon_name(&self) -> char {
@@ -8,10 +8,10 @@ impl DocumentElementIcon for Interface {
 }
 
 impl DocumentElement for Interface {
-    fn get_name(&self, _: &DataProvider) -> &str {
+    fn get_name(&self, _: &DataProvider) -> Cow<str> {
         match self.name.as_ref() {
-            Some(name) => name,
-            None => ""
+            Some(name) => Cow::Borrowed(name),
+            None => Cow::Borrowed(""),
         }
     }
 
@@ -19,21 +19,8 @@ impl DocumentElement for Interface {
         let interface = self.name.as_ref().expect("Check for empty interface name first!");
         let package = &data.package.name;
         match package.version.as_ref() {
-            Some(version) =>
-                format!(
-                    "/{}:{}/{}@{}",
-                    package.namespace,
-                    package.name,
-                    interface,
-                    version,
-                ),
-            None =>
-                format!(
-                    "/{}:{}/{}",
-                    package.namespace,
-                    package.name,
-                    interface,
-                )
+            Some(version) => format!("/{}:{}/{}@{}", package.namespace, package.name, interface, version,),
+            None => format!("/{}:{}/{}", package.namespace, package.name, interface,),
         }
     }
 

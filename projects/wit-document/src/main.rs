@@ -1,6 +1,6 @@
 use axum::{response::Html, routing::get, Router};
 use dioxus::{dioxus_core::Mutations, prelude::*};
-use std::{path::Path};
+use std::path::Path;
 use wit_document::{renderer::render_interface, DataProvider};
 use wit_parser::UnresolvedPackage;
 
