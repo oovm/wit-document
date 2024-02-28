@@ -11,7 +11,7 @@ fn ready() {
 fn test() {
     let spell = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/en_US");
     let checker = WitSpellCheck::new(spell).unwrap().check_parameters(false);
-    let wits = Path::new(env!("CARGO_MANIFEST_DIR")).join("../wit-document/tests/preview2");
+    let wits = Path::new(env!("CARGO_MANIFEST_DIR")).join("../preview2");
     // find all directories
     for entry in wits.read_dir().unwrap() {
         let entry = entry.unwrap();

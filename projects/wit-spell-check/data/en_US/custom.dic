@@ -2,6 +2,7 @@ u32
 u64
 pollable
 
+io
 cwd
 stdin
 stdout
@@ -15,7 +16,18 @@ unlink
 
 http
 https
+ip
+DNS
+ipv4
+ipv6
 tcp
 udp
+TLS
+response
 datagram
 unicast
+
+
+new
+datetime
+error

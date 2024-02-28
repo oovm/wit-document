@@ -1,7 +1,6 @@
 use hunspell_rs::{CheckResult, Hunspell};
-use indexmap::IndexMap;
-use std::{io::BufRead, path::Path};
-use wit_parser::{Function, Interface, Package, PackageName, TypeDef, UnresolvedPackage};
+use std::path::Path;
+use wit_parser::{Function, Interface, PackageName, TypeDefKind, UnresolvedPackage};
 
 /// A spell checker for wit files.
 pub struct WitSpellCheck {
@@ -71,54 +70,67 @@ impl WitSpellCheck {
         let norm =
             function.name.trim_start_matches("[constructor]").trim_start_matches("[static]").trim_start_matches("[method]");
         for split in norm.split(".") {
-            for part in split.split("-") {
-                if self.check_failed(part) {
-                    println!("- function may wrong: `{}`", part);
-                    self.log_interface(interface);
-                    self.log_package(package);
-                    self.log_suggest(part);
-                }
-            }
+            self.check_kebab_case(split, |part| {
+                println!("- function may wrong: `{}`", part);
+                self.log_interface(interface);
+                self.log_package(package);
+                self.log_suggest(part);
+            });
         }
     }
     /// Check the given parameter for spelling errors.
     fn check_parameter(&self, function: &Function, interface: &Interface, package: &PackageName) {
         for (parameter, _) in function.params.iter() {
-            for part in parameter.split("-") {
-                if self.check_failed(part) {
-                    println!("- parameter may wrong: `{}`", part);
-                    println!("  - in function `{}`", function.name);
-                    self.log_interface(interface);
-                    self.log_package(package);
-                    self.log_suggest(part);
-                }
-            }
+            self.check_kebab_case(parameter, |part| {
+                println!("- parameter may wrong: `{}`", part);
+                self.log_interface(interface);
+                self.log_package(package);
+                self.log_suggest(part);
+            });
         }
     }
     fn check_types(&self, interface: &Interface, package: &UnresolvedPackage) {
         for id in interface.types.values() {
             match package.types.get(*id) {
-                Some(typing) => match &typing.name {
-                    Some(s) => {
-                        for part in s.split("-") {
-                            if self.check_failed(part) {
-                                println!("- type may wrong: `{}`", s);
-                                self.log_interface(interface);
-                                self.log_package(&package.name);
-                                self.log_suggest(part);
-                            }
-                        }
+                Some(typing) => {
+                    match &typing.name {
+                        Some(s) => self.check_kebab_case(s, |part| {
+                            println!("- type may wrong: `{}`", part);
+                            self.log_interface(interface);
+                            self.log_package(&package.name);
+                            self.log_suggest(part);
+                        }),
+                        None => {}
                     }
-                    None => {}
-                },
+                    match &typing.kind {
+                        TypeDefKind::Record(_) => {}
+                        TypeDefKind::Resource => {}
+                        TypeDefKind::Handle(_) => {}
+                        TypeDefKind::Flags(_) => {}
+                        TypeDefKind::Tuple(_) => {}
+                        TypeDefKind::Variant(_) => {}
+                        TypeDefKind::Enum(_) => {}
+                        TypeDefKind::Option(_) => {}
+                        TypeDefKind::Result(_) => {}
+                        TypeDefKind::List(_) => {}
+                        TypeDefKind::Future(_) => {}
+                        TypeDefKind::Stream(_) => {}
+                        TypeDefKind::Type(_) => {}
+                        TypeDefKind::Unknown => {}
+                    }
+                }
                 None => {}
             }
         }
     }
-    fn check_failed(&self, word: &str) -> bool {
-        match self.hunspell.check(word) {
-            CheckResult::FoundInDictionary => false,
-            CheckResult::MissingInDictionary => true,
+    fn check_kebab_case(&self, word: &str, report: impl Fn(&str)) {
+        for part in word.split("-") {
+            match self.hunspell.check(word) {
+                CheckResult::FoundInDictionary => {}
+                CheckResult::MissingInDictionary => {
+                    report(part);
+                }
+            }
         }
     }
     fn log_interface(&self, interface: &Interface) {
