@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::collections::BTreeSet;
 use std::path::Path;
-use hunspell_rs::Hunspell;
+use hunspell_rs::{CheckResult, Hunspell};
 use wit_parser::{TypeDef, UnresolvedPackage};
 
 pub struct WitSpellCheck {
@@ -30,8 +30,25 @@ impl WitSpellCheck {
         for (_, interface) in package.interfaces.iter() {
             for (name, function) in interface.functions.iter() {
                 for (parameter, _) in function.params.iter() {
-                    if !self.hunspell.check(parameter) {
-                        println!("{}: {}", name, parameter);
+                    for part in parameter.split("-") {
+                        match self.hunspell.check(part) {
+                            CheckResult::FoundInDictionary => {}
+                            CheckResult::MissingInDictionary => {
+                                println!("- parameter may wrong: `{}`", part);
+                                println!("  - in function `{}`", name);
+                                match &interface.name {
+                                    Some(s) => {
+                                        println!("  - in interface `{}`", s);
+                                    }
+                                    None => {}
+                                }
+                                println!("  - in package `{}`", package.name);
+                                println!("  - perhaps");
+                                for suggestion in self.hunspell.suggest(part) {
+                                    println!("    - `{}`", suggestion);
+                                }
+                            }
+                        }
                     }
                 }
             }
