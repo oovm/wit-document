@@ -8,6 +8,8 @@ mod errors;
 pub mod renderer;
 mod resolver;
 
+mod helpers;
+
 pub use crate::{
     errors::{DocumentError, Result},
     resolver::DataProvider,

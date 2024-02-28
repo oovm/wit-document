@@ -1,8 +1,8 @@
 use dioxus::{core_macro::rsx, dioxus_core::Element};
 use std::{path::Path, process::id};
-use wit_parser::{
-    Enum, EnumCase, Flags, Function, FunctionKind, Interface, Resolve, TypeDef, TypeDefKind, UnresolvedPackage, Variant,
-};
+use dioxus::html::s;
+use indexmap::IndexMap;
+use wit_parser::{Enum, EnumCase, Flags, Function, FunctionKind, Interface, Resolve, TypeDef, TypeDefKind, TypeId, UnresolvedPackage, Variant};
 
 #[test]
 fn test() -> anyhow::Result<()> {
@@ -35,9 +35,32 @@ pub struct DataProvider {
 }
 
 impl DataProvider {
-    pub fn get_resources<'a>(&'a self, interface: &'a Interface) -> Vec<&'a TypeDef> {
+    pub fn get_worlds(&self) -> Vec<&String> {
+        let mut outputs = Vec::with_capacity(self.package.worlds.len());
+        for (_, interface) in self.package.worlds.iter() {
+            if !interface.name.is_empty() {
+                outputs.push(&interface.name);
+            }
+        }
+        outputs
+    }
+
+    pub fn get_interfaces(&self) -> Vec<&Interface> {
+        let mut outputs = Vec::with_capacity(self.package.interfaces.len());
+        for (_, interface) in self.package.interfaces.iter() {
+            match &interface.name {
+                Some(name) if !name.is_empty() => {
+                    outputs.push(interface);
+                }
+                _ => {}
+            }
+        }
+        outputs
+    }
+
+    pub fn get_resources<'a>(&'a self, dict: &'a IndexMap<String, TypeId>) -> Vec<&'a TypeDef> {
         let mut resources = vec![];
-        for ty in interface.types.values() {
+        for ty in dict.values() {
             match self.package.types.get(*ty) {
                 Some(s) => match s.kind {
                     TypeDefKind::Resource => {

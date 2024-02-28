@@ -14,6 +14,10 @@ impl DocumentElement for World {
         }
     }
 
+    fn main_body(&self, data: &DataProvider) -> Element {
+        todo!()
+    }
+
     fn main_card(&self, data: &DataProvider) -> Element {
         todo!()
     }
