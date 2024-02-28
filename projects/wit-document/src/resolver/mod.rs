@@ -1,34 +1,5 @@
-use dioxus::{core_macro::rsx, dioxus_core::Element};
-use std::{path::Path, process::id};
-use dioxus::html::s;
 use indexmap::IndexMap;
-use wit_parser::{Enum, EnumCase, Flags, Function, FunctionKind, Interface, Resolve, TypeDef, TypeDefKind, TypeId, UnresolvedPackage, Variant};
-
-#[test]
-fn test() -> anyhow::Result<()> {
-    let here = Path::new(env!("CARGO_MANIFEST_DIR"));
-    let mut store = DataProvider { package: UnresolvedPackage::parse_dir(&here.join("tests/preview2/cli"))? };
-    for (_, interface) in store.package.interfaces.iter() {
-        println!("=== {:?} ===", interface.name);
-        for resource in store.get_resources(interface) {
-            println!("{:?}", resource);
-        }
-        for (ty, flags) in store.get_flags(interface) {
-            println!("{:?}", ty);
-        }
-        for (ty, enumerate) in store.get_enumerate(interface) {
-            println!("{:?}", ty);
-        }
-        for (ty, variant) in store.get_variant(interface) {
-            println!("{:?}", ty);
-        }
-
-        for resource in store.get_functions(interface) {
-            println!("{:?}", resource);
-        }
-    }
-    Ok(())
-}
+use wit_parser::{Enum, Flags, Function, FunctionKind, Interface, TypeDef, TypeDefKind, TypeId, UnresolvedPackage, Variant};
 
 pub struct DataProvider {
     pub package: UnresolvedPackage,

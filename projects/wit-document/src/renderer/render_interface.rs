@@ -1,34 +1,56 @@
+
 use super::*;
 
 
+impl DocumentElementIcon for Interface {
+    fn get_icon_name(&self) -> char {
+        'I'
+    }
+}
+
 impl DocumentElement for Interface {
-    fn left_link(&self) -> Element {
+    fn get_name(&self, _: &DataProvider) -> &str {
         match self.name.as_ref() {
-            Some(value) => {
+            Some(name) => name,
+            None => ""
+        }
+    }
+
+    fn get_link(&self, data: &DataProvider) -> String {
+        let interface = self.name.as_ref().expect("Check for empty interface name first!");
+        let package = &data.package.name;
+        match package.version.as_ref() {
+            Some(version) =>
+                format!(
+                    "/{}:{}/{}@{}",
+                    package.namespace,
+                    package.name,
+                    interface,
+                    version,
+                ),
+            None =>
+                format!(
+                    "/{}:{}/{}",
+                    package.namespace,
+                    package.name,
+                    interface,
+                )
+        }
+    }
+
+    fn left_link(&self, data: &DataProvider) -> Element {
+        match self.get_name(data) {
+            "" => rsx! {},
+            name => {
+                let link = self.get_link(data);
                 rsx! {
                    li {
                         class: "left-link",
                         span { class: "type-icon", "I" }
-                        a { href: "{value}", "{value}" }
+                        a { href: link, "{name}" }
                     }
                 }
             }
-            None => rsx! {},
-        }
-    }
-
-    fn main_link(&self) -> Element {
-        match self.name.as_ref() {
-            Some(value) => {
-                rsx! {
-                   li {
-                        class: "main-link",
-                        span { class: "type-icon", "I" }
-                        a { href: "{value}", "{value}" }
-                    }
-                }
-            }
-            None => rsx! {},
         }
     }
     fn main_body(&self, data: &DataProvider) -> Element {
@@ -44,5 +66,20 @@ impl DocumentElement for Interface {
 
     fn main_card(&self, data: &DataProvider) -> Element {
         todo!()
+    }
+
+    fn main_link(&self, data: &DataProvider) -> Element {
+        match self.name.as_ref() {
+            Some(value) => {
+                rsx! {
+                   li {
+                        class: "main-link",
+                        span { class: "type-icon", "I" }
+                        a { href: "{value}", "{value}" }
+                    }
+                }
+            }
+            None => rsx! {},
+        }
     }
 }
