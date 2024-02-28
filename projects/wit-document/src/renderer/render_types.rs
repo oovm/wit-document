@@ -23,6 +23,12 @@ impl DocumentElementIcon for TypeDefKind {
     }
 }
 
+impl DocumentElementIcon for TypeDef {
+    fn get_icon_name(&self) -> char {
+        self.kind.get_icon_name()
+    }
+}
+
 
 impl DocumentElement for TypeDef {
     fn get_name(&self, _: &DataProvider) -> &str {
@@ -36,25 +42,6 @@ impl DocumentElement for TypeDef {
         self.get_name(data).to_string()
     }
 
-    fn left_link(&self, data: &DataProvider) -> Element {
-        match self.kind {
-            TypeDefKind::Record(_) => panic!(),
-            TypeDefKind::Resource => panic!(),
-            TypeDefKind::Handle(_) => panic!(),
-            TypeDefKind::Flags(_) => panic!(),
-            TypeDefKind::Tuple(_) => panic!(),
-            TypeDefKind::Variant(_) => panic!(),
-            TypeDefKind::Enum(_) => panic!(),
-            TypeDefKind::Option(_) => panic!(),
-            TypeDefKind::Result(_) => panic!(),
-            TypeDefKind::List(_) => panic!(),
-            TypeDefKind::Future(_) => panic!(),
-            TypeDefKind::Stream(_) => panic!(),
-            TypeDefKind::Type(_) => panic!(),
-            TypeDefKind::Unknown => panic!(),
-        }
-    }
-
     fn main_body(&self, data: &DataProvider) -> Element {
         todo!()
     }
@@ -63,7 +50,7 @@ impl DocumentElement for TypeDef {
         match self.kind {
             TypeDefKind::Record(_) => panic!(),
             TypeDefKind::Resource => {
-                let link = self.main_link(data);
+                let link = make_link(self, data, "main-link");
                 let document = match &self.docs.contents {
                     None => { "" }
                     Some(document) => {
@@ -98,15 +85,5 @@ impl DocumentElement for TypeDef {
         }
     }
 
-    fn main_link(&self, data: &DataProvider) -> Element {
-        let icon = self.kind.get_icon_name();
-        let value = self.get_link(data);
-        rsx! {
-           li {
-                class: "main-link",
-                span { class: "type-icon", "{icon}" }
-                a { href: "{value}", "{value}" }
-            }
-        }
-    }
+
 }

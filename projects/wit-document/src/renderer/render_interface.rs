@@ -1,4 +1,3 @@
-
 use super::*;
 
 
@@ -38,48 +37,19 @@ impl DocumentElement for Interface {
         }
     }
 
-    fn left_link(&self, data: &DataProvider) -> Element {
-        match self.get_name(data) {
-            "" => rsx! {},
-            name => {
-                let link = self.get_link(data);
-                rsx! {
-                   li {
-                        class: "left-link",
-                        span { class: "type-icon", "I" }
-                        a { href: link, "{name}" }
-                    }
-                }
-            }
-        }
-    }
     fn main_body(&self, data: &DataProvider) -> Element {
-        let resources = data.get_resources(&self.types).into_iter().map(|x| x.main_card(data));
+        let resources = main_resources(data, &self.types);
+        let functions = main_functions(data, &self.functions);
         rsx! {
             div {
                 class: "main-card",
                 {resources}
-
+                {functions}
             }
         }
     }
 
     fn main_card(&self, data: &DataProvider) -> Element {
         todo!()
-    }
-
-    fn main_link(&self, data: &DataProvider) -> Element {
-        match self.name.as_ref() {
-            Some(value) => {
-                rsx! {
-                   li {
-                        class: "main-link",
-                        span { class: "type-icon", "I" }
-                        a { href: "{value}", "{value}" }
-                    }
-                }
-            }
-            None => rsx! {},
-        }
     }
 }
