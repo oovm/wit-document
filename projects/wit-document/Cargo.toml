@@ -1,17 +1,17 @@
 [package]
-name = "sub_projects"
-publish = false
+name = "wit-document"
 version = "0.0.0"
 authors = ["Aster <192607617@qq.com>"]
 description = "..."
-repository = "https://github.com/oovm/sub_projects"
-documentation = "https://docs.rs/sub_projects"
-readme = "Readme.md"
+repository = "https://github.com/oovm/wit-document"
+documentation = "https://docs.rs/wit-document"
+readme = "readme.md"
 license = "MPL-2.0"
 edition = "2021"
 exclude = ["package.json", "tests/**"]
 
 [dependencies]
+wit-parser = "0.201.0"
 
 [dev-dependencies]
 
