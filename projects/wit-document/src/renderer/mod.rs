@@ -1,89 +1,32 @@
 use crate::DataProvider;
 use dioxus::{html::s, prelude::*};
-use wit_parser::{Interface, World};
+use wit_parser::{Interface, TypeDef, TypeDefKind, World};
 
-pub fn render_package(data: &DataProvider) -> Element {
+mod render_types;
+mod render_interface;
+mod render_world;
+
+pub fn render_interface(data: &DataProvider, interface: &Interface) -> Element {
     let words = data.package.worlds.iter().map(|(key, value)| value.left_link());
     let interfaces = data.package.interfaces.iter().map(|(key, value)| value.left_link());
+    let card = interface.main_card();
+
     rsx! {
-        div {
-            class: "container",
-            div {
-                class: "lift-list",
-                {words}
-                {interfaces}
-            }
-            div {
-                class: "left-separator"
-            }
-            ul {
-                class: "main-list",
-            }
+        div { class: "container",
+            div { class: "lift-list", {words}, {interfaces} }
+            div { class: "left-separator" }
+            ul { class: "main-list" }
         }
     }
 }
 
-pub trait LeftLink {
+
+#[allow(unused_variables)]
+pub trait DocumentElement {
     fn left_link(&self) -> Element;
+
+    fn main_body(&self, data: &DataProvider) {}
+
+    fn main_card(&self, data: &DataProvider) -> Element;
     fn main_link(&self) -> Element;
-}
-
-impl<'a> LeftLink for &'a World {
-    fn left_link(&self) -> Element {
-        match self.name.as_str() {
-            "" => rsx! {},
-            value => rsx! {
-               li {
-                    class: "left-link",
-                    span { class: "type-icon", "W" }
-                    a { href: "{value}", "{value}" }
-                }
-            },
-        }
-    }
-
-    fn main_link(&self) -> Element {
-        match self.name.as_str() {
-            "" => rsx! {},
-            value => rsx! {
-               li {
-                    class: "main-link",
-                    span { class: "type-icon", "W" }
-                    a { href: "{value}", "{value}" }
-                }
-            },
-        }
-    }
-}
-
-impl<'a> LeftLink for &'a Interface {
-    fn left_link(&self) -> Element {
-        match self.name.as_ref() {
-            Some(value) => {
-                rsx! {
-                   li {
-                        class: "left-link",
-                        span { class: "type-icon", "I" }
-                        a { href: "{value}", "{value}" }
-                    }
-                }
-            }
-            None => rsx! {},
-        }
-    }
-
-    fn main_link(&self) -> Element {
-        match self.name.as_ref() {
-            Some(value) => {
-                rsx! {
-                   li {
-                        class: "main-link",
-                        span { class: "type-icon", "I" }
-                        a { href: "{value}", "{value}" }
-                    }
-                }
-            }
-            None => rsx! {},
-        }
-    }
 }

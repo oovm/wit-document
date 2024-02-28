@@ -1,7 +1,7 @@
 use axum::{response::Html, routing::get, Router};
 use dioxus::{dioxus_core::Mutations, prelude::*};
 use std::{path::Path, thread::Scope};
-use wit_document::{renderer::render_package, DataProvider};
+use wit_document::{renderer::render_interface, DataProvider};
 use wit_parser::UnresolvedPackage;
 
 #[tokio::main]
@@ -28,5 +28,5 @@ async fn app_endpoint() -> Html<String> {
 fn app() -> Element {
     let here = Path::new(env!("CARGO_MANIFEST_DIR"));
     let store = DataProvider { package: UnresolvedPackage::parse_dir(&here.join("tests/preview2/cli")).unwrap() };
-    render_package(&store)
+    render_interface(&store)
 }

@@ -17,7 +17,7 @@ style = ["./assets/style.scss"]
 script = []
 
 [web.resource.dev]
-style = ["./assets/style.scss"]
+style = []
 
 script = []
 
