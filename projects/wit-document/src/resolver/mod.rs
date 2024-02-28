@@ -28,7 +28,9 @@ impl DataProvider {
         }
         outputs
     }
-
+    pub fn has_resources(&self, dict: &IndexMap<String, TypeId>) -> bool {
+        self.get_resources(dict).len() > 0
+    }
     pub fn get_resources<'a>(&'a self, dict: &'a IndexMap<String, TypeId>) -> Vec<&'a TypeDef> {
         let mut resources = vec![];
         for ty in dict.values() {
@@ -90,7 +92,10 @@ impl DataProvider {
         resources
     }
 
-    pub fn get_functions<'a>(&'a self, interface: &'a Interface) -> Vec<&'a Function> {
-        interface.functions.values().filter(|x| x.kind == FunctionKind::Freestanding).collect()
+    pub fn has_functions<'a>(&'a self, functions: &'a IndexMap<String, Function>) -> bool {
+        self.get_functions(functions).len() > 0
+    }
+    pub fn get_functions<'a>(&'a self, functions: &'a IndexMap<String, Function>) -> Vec<&'a Function> {
+        functions.values().filter(|x| x.kind == FunctionKind::Freestanding).collect()
     }
 }
