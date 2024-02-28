@@ -28,8 +28,8 @@ async fn app_endpoint() -> Html<String> {
 fn app() -> Element {
     let here = Path::new(env!("CARGO_MANIFEST_DIR"));
     let store = DataProvider { package: UnresolvedPackage::parse_dir(&here.join("tests/preview2/cli")).unwrap() };
-
-    store.getinterface("cli").unwrap().
-
-    render_interface(&store)
+    let example = store.get_interfaces().into_iter().map(|x| render_interface(&store, x));
+    rsx! {
+        {example}
+    }
 }
