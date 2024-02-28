@@ -1,19 +1,13 @@
-use std::path::Path;
-use std::process::id;
-use dioxus::core_macro::rsx;
-use dioxus::dioxus_core::Element;
-use wit_parser::{Enum, EnumCase, Flags, Function, FunctionKind, Interface, Resolve, TypeDef, TypeDefKind, UnresolvedPackage, Variant};
+use dioxus::{core_macro::rsx, dioxus_core::Element};
+use std::{path::Path, process::id};
+use wit_parser::{
+    Enum, EnumCase, Flags, Function, FunctionKind, Interface, Resolve, TypeDef, TypeDefKind, UnresolvedPackage, Variant,
+};
 
 #[test]
 fn test() -> anyhow::Result<()> {
     let here = Path::new(env!("CARGO_MANIFEST_DIR"));
-    let mut store = DataProvider {
-        package: UnresolvedPackage::parse_dir(&here.join("tests/preview2/cli"))?,
-    };
-
-
-
-
+    let mut store = DataProvider { package: UnresolvedPackage::parse_dir(&here.join("tests/preview2/cli"))? };
     for (_, interface) in store.package.interfaces.iter() {
         println!("=== {:?} ===", interface.name);
         for resource in store.get_resources(interface) {
@@ -36,7 +30,6 @@ fn test() -> anyhow::Result<()> {
     Ok(())
 }
 
-
 pub struct DataProvider {
     pub package: UnresolvedPackage,
 }
@@ -46,14 +39,12 @@ impl DataProvider {
         let mut resources = vec![];
         for ty in interface.types.values() {
             match self.package.types.get(*ty) {
-                Some(s) => {
-                    match s.kind {
-                        TypeDefKind::Resource => {
-                            resources.push(s);
-                        }
-                        _ => {}
+                Some(s) => match s.kind {
+                    TypeDefKind::Resource => {
+                        resources.push(s);
                     }
-                }
+                    _ => {}
+                },
                 None => {}
             }
         }
@@ -63,14 +54,12 @@ impl DataProvider {
         let mut resources = vec![];
         for ty in interface.types.values() {
             match self.package.types.get(*ty) {
-                Some(s) => {
-                    match &s.kind {
-                        TypeDefKind::Flags(flags) => {
-                            resources.push((s, flags));
-                        }
-                        _ => {}
+                Some(s) => match &s.kind {
+                    TypeDefKind::Flags(flags) => {
+                        resources.push((s, flags));
                     }
-                }
+                    _ => {}
+                },
                 None => {}
             }
         }
@@ -80,14 +69,12 @@ impl DataProvider {
         let mut resources = vec![];
         for ty in interface.types.values() {
             match self.package.types.get(*ty) {
-                Some(s) => {
-                    match &s.kind {
-                        TypeDefKind::Enum(e) => {
-                            resources.push((s, e));
-                        }
-                        _ => {}
+                Some(s) => match &s.kind {
+                    TypeDefKind::Enum(e) => {
+                        resources.push((s, e));
                     }
-                }
+                    _ => {}
+                },
                 None => {}
             }
         }
@@ -97,14 +84,12 @@ impl DataProvider {
         let mut resources = vec![];
         for ty in interface.types.values() {
             match self.package.types.get(*ty) {
-                Some(s) => {
-                    match &s.kind {
-                        TypeDefKind::Variant(v) => {
-                            resources.push((s, v));
-                        }
-                        _ => {}
+                Some(s) => match &s.kind {
+                    TypeDefKind::Variant(v) => {
+                        resources.push((s, v));
                     }
-                }
+                    _ => {}
+                },
                 None => {}
             }
         }
