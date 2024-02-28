@@ -1,0 +1,26 @@
+[application]
+name = "project_name"
+default_platform = "web"
+out_dir = "dist"
+asset_dir = "assets"
+
+[web.app]
+title = "wit-document"
+
+[web.watcher]
+reload_html = true
+watch_path = ["src", "assets"]
+
+
+[web.resource]
+style = ["./assets/style.scss"]
+script = []
+
+[web.resource.dev]
+style = ["./assets/style.scss"]
+
+script = []
+
+
+[[web.proxy]]
+backend = "http://localhost:8000/api/"

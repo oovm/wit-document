@@ -1,6 +1,6 @@
 #[derive(Debug, Copy, Clone)]
 pub enum DocumentError {
-    UnknownError
+    UnknownError,
 }
 
 pub type Result<T> = std::result::Result<T, DocumentError>;
