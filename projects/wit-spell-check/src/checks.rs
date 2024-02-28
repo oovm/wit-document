@@ -1,6 +1,7 @@
 use hunspell_rs::{CheckResult, Hunspell};
-use std::path::Path;
-use wit_parser::{Function, Interface, PackageName, TypeDef, UnresolvedPackage};
+use indexmap::IndexMap;
+use std::{io::BufRead, path::Path};
+use wit_parser::{Function, Interface, Package, PackageName, TypeDef, UnresolvedPackage};
 
 /// A spell checker for wit files.
 pub struct WitSpellCheck {
@@ -61,32 +62,7 @@ impl WitSpellCheck {
                 }
             }
             if self.check_type {
-                for id in interface.types.values() {
-                    match package.types.get(*id) {
-                        Some(s) => match &s.name {
-                            Some(s) => {
-                                for part in s.split("-") {
-                                    match self.hunspell.check(part) {
-                                        CheckResult::FoundInDictionary => {}
-                                        CheckResult::MissingInDictionary => {
-                                            println!("- type may wrong: `{}`", part);
-                                            match &interface.name {
-                                                Some(s) => {
-                                                    println!("  - in interface `{}`", s);
-                                                }
-                                                None => {}
-                                            }
-                                            println!("  - in package `{}`", package.name);
-                                            println!("  - perhaps {:?}", self.hunspell.suggest(part));
-                                        }
-                                    }
-                                }
-                            }
-                            None => {}
-                        },
-                        None => {}
-                    }
-                }
+                self.check_types(interface, &package);
             }
         }
     }
@@ -96,19 +72,11 @@ impl WitSpellCheck {
             function.name.trim_start_matches("[constructor]").trim_start_matches("[static]").trim_start_matches("[method]");
         for split in norm.split(".") {
             for part in split.split("-") {
-                match self.hunspell.check(part) {
-                    CheckResult::FoundInDictionary => {}
-                    CheckResult::MissingInDictionary => {
-                        println!("- function may wrong: `{}`", part);
-                        match &interface.name {
-                            Some(s) => {
-                                println!("  - in interface `{}`", s);
-                            }
-                            None => {}
-                        }
-                        println!("  - in package `{}`", package.name);
-                        println!("  - perhaps {:?}", self.hunspell.suggest(part));
-                    }
+                if self.check_failed(part) {
+                    println!("- function may wrong: `{}`", part);
+                    self.log_interface(interface);
+                    self.log_package(package);
+                    self.log_suggest(part);
                 }
             }
         }
@@ -117,22 +85,51 @@ impl WitSpellCheck {
     fn check_parameter(&self, function: &Function, interface: &Interface, package: &PackageName) {
         for (parameter, _) in function.params.iter() {
             for part in parameter.split("-") {
-                match self.hunspell.check(part) {
-                    CheckResult::FoundInDictionary => {}
-                    CheckResult::MissingInDictionary => {
-                        println!("- parameter may wrong: `{}`", part);
-                        println!("  - in function `{}`", function.name);
-                        match &interface.name {
-                            Some(s) => {
-                                println!("  - in interface `{}`", s);
-                            }
-                            None => {}
-                        }
-                        println!("  - in package `{}`", package.name);
-                        println!("  - perhaps {:?}", self.hunspell.suggest(part));
-                    }
+                if self.check_failed(part) {
+                    println!("- parameter may wrong: `{}`", part);
+                    println!("  - in function `{}`", function.name);
+                    self.log_interface(interface);
+                    self.log_package(package);
+                    self.log_suggest(part);
                 }
             }
         }
+    }
+    fn check_types(&self, interface: &Interface, package: &UnresolvedPackage) {
+        for id in interface.types.values() {
+            match package.types.get(*id) {
+                Some(typing) => match &typing.name {
+                    Some(s) => {
+                        for part in s.split("-") {
+                            if self.check_failed(part) {
+                                println!("- type may wrong: `{}`", s);
+                                self.log_interface(interface);
+                                self.log_package(&package.name);
+                                self.log_suggest(part);
+                            }
+                        }
+                    }
+                    None => {}
+                },
+                None => {}
+            }
+        }
+    }
+    fn check_failed(&self, word: &str) -> bool {
+        match self.hunspell.check(word) {
+            CheckResult::FoundInDictionary => false,
+            CheckResult::MissingInDictionary => true,
+        }
+    }
+    fn log_interface(&self, interface: &Interface) {
+        if let Some(name) = interface.name.as_ref() {
+            println!("  - in interface `{}`", name);
+        }
+    }
+    fn log_package(&self, package: &PackageName) {
+        println!("  - in package `{}`", package);
+    }
+    fn log_suggest(&self, word: &str) {
+        println!("  - perhaps {:?}", self.hunspell.suggest(word));
     }
 }
