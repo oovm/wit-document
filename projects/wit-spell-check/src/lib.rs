@@ -5,3 +5,6 @@
 #![doc(html_favicon_url = "https://raw.githubusercontent.com/oovm/shape-rs/dev/projects/images/Trapezohedron.svg")]
 
 mod checks;
+
+
+pub use crate::checks::WitSpellCheck;
